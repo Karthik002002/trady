@@ -1,8 +1,11 @@
 #root {
-  max-width: 1280px;
+  /* max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  text-align: center; */
+  /* font-family: "Michroma", sans-serif; */
+  font-family: "Montserrat", sans-serif;
+  width: 100%;
 }
 
 .logo {
@@ -39,4 +42,109 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.michroma-regular {
+  font-family: "Michroma", sans-serif;
+}
+
+.open-sans {
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+
+  font-style: normal;
+}
+
+.montserrat {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+
+  font-style: normal;
+}
+
+.pixelify-sans {
+  font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+
+  font-style: normal;
+}
+
+.doto {
+  font-family: "Doto", sans-serif;
+  font-optical-sizing: auto;
+
+  font-style: normal;
+}
+
+.sarpanch-regular {
+  font-family: "Sarpanch", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.sarpanch-medium {
+  font-family: "Sarpanch", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.sarpanch-semibold {
+  font-family: "Sarpanch", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.sarpanch-bold {
+  font-family: "Sarpanch", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.sarpanch-extrabold {
+  font-family: "Sarpanch", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.sarpanch-black {
+  font-family: "Sarpanch", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.dorsa-regular {
+  font-family: "Dorsa", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+select option {
+  background: black;
+}
+
+body {
+  --sb-track-color: #2c3031;
+  --sb-thumb-color: #00ff33;
+  --sb-size: 7px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: var(--sb-size);
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 6px;
+  border: 8px solid #ffffff;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .custom-scrollbar {
+    scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+  }
 }
