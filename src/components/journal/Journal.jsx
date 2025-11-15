@@ -10,15 +10,18 @@ import { AiTwotoneDelete } from "react-icons/ai";
 import { HiMiniPhoto } from "react-icons/hi2";
 import EditTradeModal from "./EditRealTrade";
 import ReusableModal from "../common/ReusableModal";
-import { useDeleteItem } from "../queries/UseDelete";
-// import { LocalData } from "../common/ComFuncs";
+import { MdRemoveRedEye } from "react-icons/md";
+
 import { useLocalUserData } from "../queries/UseLocalData";
+import StatsDisplay from "../common/StatsDisplay";
+import ViewReal from "./ViewReal";
 
 const Journal = () => {
   const LocalData = useLocalUserData();
   const [portfolioFilter, setPortfolioFilter] = useState("");
 
   const [editStatus, setEditStatus] = useState({ show: false, data: null });
+  const [viewStatus, setViewStatus] = useState({ show: false, data: null });
   const [DeleteStatus, setDeleteStatus] = useState({ show: false, data: null });
   const [ViewImage, setViewImage] = useState({ show: false, image: null });
   const {
@@ -27,11 +30,10 @@ const Journal = () => {
     isError,
     refetch: refetchJournals,
   } = useFetchData("real_journals");
-  const [JournalData, setJournalData] = useState([]);
 
   useEffect(() => {
     if (journals) {
-      setPortfolioFilter(journals[0]?.journalTitle);
+      setPortfolioFilter(journals[0]?.title);
     }
   }, [journals]);
 
@@ -57,7 +59,9 @@ const Journal = () => {
 
   const GetSymbol = (id) => {
     if (symbol.length > 0) {
-      return symbol.find((val) => val.id === id).symbol || "-";
+      console.log(symbol);
+      
+      return symbol?.find((val) => val.id === id).symbol || "-";
     }
   };
   // Flatten all trades from all journals
@@ -93,9 +97,25 @@ const Journal = () => {
   const uniquePortfolios = [...new Set(allTrades.map((t) => t.journalTitle))];
 
   // Apply filter
-  const filteredTrades = allTrades.filter((t) =>
-    portfolioFilter ? t.journalTitle === portfolioFilter : true
-  );
+  const filteredTrades = allTrades
+    .filter((t) => {
+      return portfolioFilter ? t.journalTitle === portfolioFilter : true;
+    })
+    .map((t) => {
+      const portfolioDisplay = t.portfolio_id
+        ? portfolio.find((val) => val.id === t.portfolio_id)?.name
+        : "-";
+      const strategyDisplay = t.strategy_id
+        ? strategy.find((val) => val.id === t.strategy_id)?.name
+        : "-";
+
+      return {
+        ...t,
+        portfolio_display: portfolioDisplay,
+        strategy_display: strategyDisplay,
+        symbol_display: GetSymbol(t.symbol_id),
+      };
+    });
 
   if (isLoading) return <div className="p-4">Loading...</div>;
   if (isError)
@@ -112,7 +132,7 @@ const Journal = () => {
   let total_pl = 0;
   let total_trades = 0;
   let filterJournals = [...journals];
-
+  let pl = 0;
   if (portfolioFilter) {
     filterJournals = filterJournals.filter(
       (val) => val.title === portfolioFilter
@@ -124,16 +144,25 @@ const Journal = () => {
     loss_trades += journal.loss_trades;
     neutral_trades += journal.neutral_trades;
     total_pl += journal.total_pl;
+    pl += journal.trades.reduce((acc, cum) => acc + cum.pl, 0);
   });
 
   total_trades = win_trades + loss_trades + neutral_trades;
 
+  // 🛠️ Correct win_rate calculation
+  const win_rate = total_trades
+    ? Math.round((win_trades / total_trades) * 100)
+    : 0;
+
   const overall = {
-    win_rate: total_trades ? (win_trades / total_trades) * 100 : 0,
+    win_rate,
     win_trades,
     loss_trades,
     neutral_trades,
-    avg_return: Math.round(total_trades ? total_pl / total_trades : 0, 2),
+    avg_return: total_trades
+      ? Math.round((total_pl / total_trades) * 100) / 100
+      : 0, // avg_return rounded to 2 decimal places
+    pl,
   };
 
   // console.log(overall);
@@ -142,7 +171,7 @@ const Journal = () => {
     <>
       <div className="p-4">
         {/* Filter */}
-        <div className="flex flex-row justify-between mb-3 items-center">
+        <div className="flex flex-row justify-between  items-center">
           <div className="">
             <label className="mr-2 text-sm font-medium">
               Filter by Journal:
@@ -227,9 +256,18 @@ const Journal = () => {
                       "-"
                     )}
                   </td>
-                  <td className="text-left flex flex-row items-center ">
+                  <td className="text-left flex flex-row items-center pl-3 ">
                     <div
-                      className="rounded-lg hover:bg-sky-400 w-fit hover:text-gray-800 transition-all duration-300 p-1 cursor-pointer mt-1"
+                      className="rounded-lg hover:bg-purple-400 w-fit hover:text-gray-800 transition-all duration-300 p-1 cursor-pointer mt-1"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setViewStatus({ show: true, data: trade });
+                      }}
+                    >
+                      <MdRemoveRedEye size={20} />
+                    </div>
+                    <div
+                      className="rounded-lg ml-2 hover:bg-sky-400 w-fit hover:text-gray-800 transition-all duration-300 p-1 cursor-pointer mt-1"
                       onClick={(e) => {
                         e.preventDefault();
                         setEditStatus({ show: true, data: trade });
@@ -307,6 +345,14 @@ const Journal = () => {
         </div>
       </ReusableModal>
 
+      <ViewReal
+        show={viewStatus.show}
+        ModalData={viewStatus.data}
+        handleShow={() => {
+          setViewStatus((prev) => ({ ...prev, show: false, data: {} }));
+        }}
+      />
+
       <EditTradeModal
         journals={journals}
         portfolios={portfolio}
@@ -322,40 +368,3 @@ const Journal = () => {
 };
 
 export default Journal;
-
-const StatsCard = ({ title, value, bgColor }) => (
-  <div
-    className={`${bgColor} bg-stone-800 p-4 rounded-lg w-full max-w-[15vw] text-center content-center flex flex-row justify-evenly items-center`}
-  >
-    <h3 className=" text-white font-semibold">{title}</h3>
-    <p className="text-2xl font-bold">{value}</p>
-  </div>
-);
-
-const StatsDisplay = ({
-  win_rate,
-  win_trades,
-  loss_trades,
-  neutral_trades,
-  avg_return,
-}) => (
-  <div className="flex flex-wrap gap-4 p-4 justify-center">
-    <StatsCard
-      title="Win Rate"
-      value={`${win_rate}%`}
-      bgColor="text-blue-500 "
-    />
-    <StatsCard title="Win Trades" value={win_trades} bgColor="text-green-500" />
-    <StatsCard title="Loss Trades" value={loss_trades} bgColor="text-red-500" />
-    <StatsCard
-      title="Neutral Trades"
-      value={neutral_trades}
-      bgColor="text-sky-600"
-    />
-    <StatsCard
-      title="Average Return"
-      value={`${avg_return}%`}
-      bgColor="text-purple-500"
-    />
-  </div>
-);

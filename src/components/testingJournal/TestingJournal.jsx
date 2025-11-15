@@ -1,5 +1,10 @@
 import React from "react";
+import TestJournal from "../journal/Test/TestJournal";
 
 export default function TestingJournal() {
-  return <div>TestingJournal</div>;
+  return (
+    <>
+      <TestJournal />
+    </>
+  );
 }

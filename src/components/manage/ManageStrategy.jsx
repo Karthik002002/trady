@@ -36,7 +36,9 @@ export default function ManagePortfolio() {
     const url =
       mode === "add" ? APPURL.strategy : `${APPURL.strategy}${item?.id}/`;
     const method = mode === "add" ? "POST" : "PUT";
-
+    // console.log(description);
+    
+    // return;
     const response = await fetch(url, {
       method,
       headers: {
@@ -175,19 +177,19 @@ export default function ManagePortfolio() {
         isOpen={modal.show}
         handleClose={() => setModal({ show: false, mode: "add", item: null })}
       >
-        <div className="bg-stone-900 max-w-md w-full rounded-lg p-6 text-white">
+        <div className="bg-stone-900 max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar rounded-lg p-6 text-white">
           <h3 className="text-lg mb-4">
             {modal.mode === "add" ? "Add Item" : "Edit Item"}
           </h3>
           <input
-            className="w-full p-2 rounded bg-stone-700 text-white border mb-4"
+            className="w-full p-2 rounded bg-stone-700 text-white border mb-4 "
             placeholder="Enter symbol"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           />
 
           <textarea
-            className="w-full p-2 rounded bg-stone-700 text-white border mb-4"
+            className="w-full p-2 rounded bg-stone-700 text-white border mb-4 custom-scrollbar max-h-[50vh] min-h-[30vh] overflow-y-auto"
             placeholder="Enter description"
             value={formData.description}
             onChange={(e) =>
