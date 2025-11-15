@@ -50,7 +50,13 @@ export default function Login() {
         <h6 className="text-gray-400 michroma-regular mb-10">
           Welcome to the Journey
         </h6>
-        <div className="flex flex-col gap-4 w-full max-w-md">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // Prevent page reload
+            handleSubmit(e);
+          }}
+          className="flex flex-col gap-4 w-full max-w-md"
+        >
           {/* Username */}
           <div className="flex flex-col justify-start w-full">
             <label className="text-gray-400 text-md font-medium mb-1">
@@ -84,28 +90,26 @@ export default function Login() {
               {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
             </span>
           </div>
-        </div>
 
-        <button
-          className={`w-[92%] h-[2.5em]  bg-gradient-to-br !border-none outline-none mt-4 from-green-200 to-green-600 rounded-lg mb-4 focus:ring-4 focus:ring-green-400 focus:outline-none focus:border-none text-center place-items-center ${
-            isLoading ? "opacity-50 cursor-wait" : "cursor-pointer"
-          }`}
-          onClick={(e) => {
-            handleSubmit(e);
-          }}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <SpinnerCircularFixed
-              size={20}
-              color="white"
-              speed={250}
-              thickness={200}
-            />
-          ) : (
-            "Login"
-          )}
-        </button>
+          <button
+            type="submit"
+            className={`w-full h-[2.5em] bg-gradient-to-br !border-none outline-none mt-4 from-green-200 to-green-600 rounded-lg mb-4 focus:ring-4 focus:ring-green-400 focus:outline-none focus:border-none text-center place-items-center ${
+              isLoading ? "opacity-50 cursor-wait" : "cursor-pointer"
+            }`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <SpinnerCircularFixed
+                size={20}
+                color="white"
+                speed={250}
+                thickness={200}
+              />
+            ) : (
+              "Login"
+            )}
+          </button>
+        </form>
       </div>
     </div>
   );

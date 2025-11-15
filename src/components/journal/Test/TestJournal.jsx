@@ -2,34 +2,35 @@ import React, { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import moment from "moment";
-import { APPURL } from "../../../URL";
-import { useFetchData } from "../queries/UseFetchData";
-import AddTradeModal from "./AddRealTrade";
+import { APPURL } from "../../../../URL";
+import { useFetchData } from "../../queries/UseFetchData";
+// import AddTradeModal from "../AddRealTrade";
 import { TbEditCircle } from "react-icons/tb";
 import { AiTwotoneDelete } from "react-icons/ai";
 import { HiMiniPhoto } from "react-icons/hi2";
-import EditTradeModal from "./EditRealTrade";
-import ReusableModal from "../common/ReusableModal";
+import ReusableModal from "../../common/ReusableModal";
+import { useLocalUserData } from "../../queries/UseLocalData";
+import EditTestModal from "./EditTestTrade";
+import AddTestModal from "./AddTestTrade";
+import StatsDisplay from "../../common/StatsDisplay";
 import { MdRemoveRedEye } from "react-icons/md";
+import ViewReal from "../ViewReal";
+import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 
-import { useLocalUserData } from "../queries/UseLocalData";
-import StatsDisplay from "../common/StatsDisplay";
-import ViewReal from "./ViewReal";
-
-const Journal = () => {
+const TestJournal = () => {
   const LocalData = useLocalUserData();
   const [portfolioFilter, setPortfolioFilter] = useState("");
 
   const [editStatus, setEditStatus] = useState({ show: false, data: null });
-  const [viewStatus, setViewStatus] = useState({ show: false, data: null });
   const [DeleteStatus, setDeleteStatus] = useState({ show: false, data: null });
+  const [ViewStatus, setViewStatus] = useState({ show: false, data: null });
   const [ViewImage, setViewImage] = useState({ show: false, image: null });
   const {
     data: journals = [],
     isLoading,
     isError,
     refetch: refetchJournals,
-  } = useFetchData("real_journals");
+  } = useFetchData("test_journals");
 
   useEffect(() => {
     if (journals) {
@@ -59,9 +60,7 @@ const Journal = () => {
 
   const GetSymbol = (id) => {
     if (symbol.length > 0) {
-      console.log(symbol);
-      
-      return symbol?.find((val) => val.id === id).symbol || "-";
+      return symbol.find((val) => val.id === id).symbol || "-";
     }
   };
   // Flatten all trades from all journals
@@ -98,9 +97,9 @@ const Journal = () => {
 
   // Apply filter
   const filteredTrades = allTrades
-    .filter((t) => {
-      return portfolioFilter ? t.journalTitle === portfolioFilter : true;
-    })
+    .filter((t) =>
+      portfolioFilter ? t.journalTitle === portfolioFilter : true
+    )
     .map((t) => {
       const portfolioDisplay = t.portfolio_id
         ? portfolio.find((val) => val.id === t.portfolio_id)?.name
@@ -162,7 +161,7 @@ const Journal = () => {
     avg_return: total_trades
       ? Math.round((total_pl / total_trades) * 100) / 100
       : 0, // avg_return rounded to 2 decimal places
-    pl,
+    pl: pl.toFixed(2),
   };
 
   // console.log(overall);
@@ -189,8 +188,11 @@ const Journal = () => {
               ))}
             </select>
           </div>
-          <div>
-            <AddTradeModal
+          <div className="flex flex-row items-center">
+            <div className="px-2  py-2.5 bg-sky-300 hover:bg-sky-800 hover:text-white cursor-pointer text-gray-800 rounded-lg mr-2">
+              <PiMicrosoftExcelLogoFill size={24} />
+            </div>
+            <AddTestModal
               journals={journals}
               symbols={symbol}
               portfolios={portfolio}
@@ -258,7 +260,7 @@ const Journal = () => {
                   </td>
                   <td className="text-left flex flex-row items-center pl-3 ">
                     <div
-                      className="rounded-lg hover:bg-purple-400 w-fit hover:text-gray-800 transition-all duration-300 p-1 cursor-pointer mt-1"
+                      className="rounded-lg hover:bg-sky-400 w-fit hover:text-gray-800 transition-all duration-300 p-1 cursor-pointer mt-1"
                       onClick={(e) => {
                         e.preventDefault();
                         setViewStatus({ show: true, data: trade });
@@ -344,16 +346,14 @@ const Journal = () => {
           </div>
         </div>
       </ReusableModal>
-
       <ViewReal
-        show={viewStatus.show}
-        ModalData={viewStatus.data}
+        show={ViewStatus.show}
+        ModalData={ViewStatus.data}
         handleShow={() => {
-          setViewStatus((prev) => ({ ...prev, show: false, data: {} }));
+          setViewStatus({ data: null, show: false });
         }}
       />
-
-      <EditTradeModal
+      <EditTestModal
         journals={journals}
         portfolios={portfolio}
         strategies={strategy}
@@ -367,4 +367,4 @@ const Journal = () => {
   );
 };
 
-export default Journal;
+export default TestJournal;

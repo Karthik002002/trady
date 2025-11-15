@@ -5,6 +5,7 @@ import Dashboard from "./components/dashboard/Dashboard";
 import Journal from "./components/journal/Journal";
 import TestingJournal from "./components/testingJournal/TestingJournal";
 import Manage from "./components/manage/Manage";
+import Execution from "./components/execution/Execution";
 
 const AppRouter = () => {
   return (
@@ -16,6 +17,7 @@ const AppRouter = () => {
           <Route path="/journal" element={<Journal />} />
           <Route path="/testing" element={<TestingJournal />} />
           <Route path="/manage" element={<Manage />} />
+          <Route path="/execution" element={<Execution />} />
         </Route>
       </Routes>
     </Router>

@@ -7,6 +7,7 @@ import ProfileMenu from "./ProfileMenu";
 export default function Navbar() {
   const tabs = [
     { display: "Dashboard", link: "/dashboard" },
+    { display: "Execution", link: "/execution" },
     { display: "Journal", link: "/journal" },
     { display: "Testing", link: "/testing" },
     { display: "Manage", link: "/manage" },

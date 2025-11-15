@@ -11,7 +11,7 @@ import { faL } from "@fortawesome/free-solid-svg-icons";
 import { useLocalUserData } from "../queries/UseLocalData";
 import ReusableTable from "../common/ReusableTable";
 
-export default function ManagePortfolio() {
+export default function ManageEntrySetups() {
   const LocalData = useLocalUserData();
   const [modal, setModal] = useState({ show: false, mode: "add", item: null });
   const [deleteData, setDeleteData] = useState({ show: false, data: null });
@@ -19,38 +19,30 @@ export default function ManagePortfolio() {
 
   const toast = useToast();
 
-  // const {
-  //   data: portfolio = [],
-  //   isLoading: portfolioLoading,
-  //   isError: portfolioError,
-  //   refetch: refetchportfolio,
-  // } = useFetchData("portfolio");
   const {
-    data: strategy = [],
-    isLoading: strategyLoading,
-    isError: strategyError,
-    refetch: refetchStrategy,
-  } = useFetchData("strategy");
+    data: journal = [],
+    isLoading: JournalLoading,
+    isError: JourrnalError,
+    refetch: refetchJournal,
+  } = useFetchData("journal");
 
-  const submitHandler = async ({ mode, item, name, description, token }) => {
+  const submitHandler = async ({ mode, item, title, type, token }) => {
     const url =
-      mode === "add" ? APPURL.strategy : `${APPURL.strategy}${item?.id}/`;
-    const method = mode === "add" ? "POST" : "PUT";
-    // console.log(description);
-    
-    // return;
+      mode === "add" ? APPURL.journal : `${APPURL.journal}${item?.id}/`;
+    const method = mode === "add" ? "POST" : "PATCH";
+
     const response = await fetch(url, {
       method,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ title, type }),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Something went wrong");
+      throw new Error(error.message || "Something went wrong");
     }
 
     return await response.json();
@@ -63,18 +55,18 @@ export default function ManagePortfolio() {
     isError,
     error,
   } = useMutation({
-    mutationFn: ({ mode, item, name, description }) =>
+    mutationFn: ({ mode, item, title, type }) =>
       submitHandler({
         mode,
         item,
-        name,
-        description,
+        title,
+        type,
         token: LocalData?.token,
       }),
     onSuccess: () => {
       setModal({ show: false, mode: "add", item: null });
       setFormData({ symbol: "", name: "" });
-      refetchStrategy();
+      refetchJournal();
     },
     onError: (err) => {
       toast.error(err.message);
@@ -83,7 +75,7 @@ export default function ManagePortfolio() {
   });
 
   const deleteHandler = async ({ id, token }) => {
-    const url = `${APPURL.strategy}${id}/`;
+    const url = `${APPURL.journal}${id}/`;
     const response = await fetch(url, {
       method: "DELETE",
       headers: {
@@ -93,7 +85,7 @@ export default function ManagePortfolio() {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || "Failed to delete symbol");
+      throw new Error(error.error || "Failed to delete journal");
     }
 
     return true;
@@ -107,12 +99,12 @@ export default function ManagePortfolio() {
   } = useMutation({
     mutationFn: ({ id }) => deleteHandler({ id, token: LocalData?.token }),
     onSuccess: () => {
-      toast.success("Strategy deleted");
-      refetchStrategy();
+      toast.success("Journal deleted");
+      refetchJournal();
       setDeleteData({ data: null, show: false });
     },
     onError: (err) => {
-      toast.error(err.message || "Error deleting Strategy");
+      toast.error(err.message || "Error deleting Journal");
       console.error("Delete Error:", err);
     },
   });
@@ -120,6 +112,11 @@ export default function ManagePortfolio() {
   const openModal = (mode, item = null) => {
     setFormData({ ...item });
     setModal({ show: true, mode, item: item });
+  };
+
+  const RowDisplay = {
+    test: "Test",
+    real: "Real",
   };
 
   return (
@@ -136,16 +133,17 @@ export default function ManagePortfolio() {
       <ReusableTable
         columns={[
           { label: "ID", accessor: "id", sortable: true },
-          { label: "Name", accessor: "name", sortable: true },
+          { label: "Name", accessor: "title", sortable: true },
           {
-            label: "Description",
-            accessor: "description",
+            label: "Type",
+            accessor: "type",
+            sortable: true,
             render: (row) => (
               <div
                 className="max-w-[25em] w-[25em] overflow-hidden whitespace-nowrap text-ellipsis"
-                title={row.description}
+                title={row.type}
               >
-                {row.description || "-"}
+                {RowDisplay[row.type] || "-"}
               </div>
             ),
           },
@@ -170,45 +168,44 @@ export default function ManagePortfolio() {
             ),
           },
         ]}
-        data={strategy}
+        data={journal}
       />
 
       <ReusableModal
         isOpen={modal.show}
         handleClose={() => setModal({ show: false, mode: "add", item: null })}
       >
-        <div className="bg-stone-900 max-w-3xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar rounded-lg p-6 text-white">
+        <div className="bg-stone-900 max-w-md w-full rounded-lg p-6 text-white">
           <h3 className="text-lg mb-4">
             {modal.mode === "add" ? "Add Item" : "Edit Item"}
           </h3>
-          <input
-            className="w-full p-2 rounded bg-stone-700 text-white border mb-4 "
-            placeholder="Enter symbol"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
 
-          <textarea
-            className="w-full p-2 rounded bg-stone-700 text-white border mb-4 custom-scrollbar max-h-[50vh] min-h-[30vh] overflow-y-auto"
-            placeholder="Enter description"
-            value={formData.description}
+          <input
+            className="w-full p-2 rounded bg-stone-700 text-white border mb-4"
+            placeholder="Enter title"
+            value={formData.title}
             onChange={(e) =>
-              setFormData({ ...formData, description: e.target.value })
+              setFormData({ ...formData, title: e.target.value })
             }
           />
+
+          <select
+            className="w-full p-2 rounded bg-stone-700 text-white border mb-4"
+            value={formData.type}
+            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+          >
+            <option value="">Select Type</option>
+            <option value="test">Test</option>
+            <option value="real">Real</option>
+          </select>
 
           <div className="flex justify-end">
             <button
               className="px-4 py-2 bg-green-600 text-white rounded hover:!bg-green-700 hover:!outline-green-400 hover:!border-green-400"
               onClick={() => {
-                if (!formData.name) {
-                  toast.error("Name is mandatory");
-                  return;
-                }
-                if (!formData.description) {
-                  toast.error("Description is mandatory");
-                  return;
-                }
+                if (!formData.title) return toast.error("Title is mandatory");
+                if (!formData.type) return toast.error("Type is mandatory");
+
                 savePortfolio({
                   mode: modal.mode,
                   item: modal.item,
@@ -221,6 +218,7 @@ export default function ManagePortfolio() {
           </div>
         </div>
       </ReusableModal>
+
       <ReusableModal
         isOpen={deleteData.show}
         handleClose={() => {

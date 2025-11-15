@@ -6,10 +6,36 @@ import { useLocalUserData } from "./UseLocalData";
 // const LocalData = JSON.parse(window.localStorage.getItem("user"));
 
 export const useFetchData = (key) => {
-
   const fetchMap = {
     real_journals: async () => {
       const res = await axios.get(APPURL.real_journal, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LocalData.token}`,
+        },
+      });
+      return res.data;
+    },
+    test_journals: async () => {
+      const res = await axios.get(APPURL.test_journal, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LocalData.token}`,
+        },
+      });
+      return res.data;
+    },
+    all_journal: async () => {
+      const res = await axios.get(APPURL.all_journal, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LocalData.token}`,
+        },
+      });
+      return res.data;
+    },
+    execution: async () => {
+      const res = await axios.get(APPURL.execution, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${LocalData.token}`,
@@ -55,6 +81,15 @@ export const useFetchData = (key) => {
       });
       return res.data;
     },
+    goal: async () => {
+      const res = await axios.get(APPURL.goal, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${LocalData.token}`,
+        },
+      });
+      return res.data;
+    },
   };
   const LocalData = useLocalUserData();
   const query = useQuery({
@@ -63,8 +98,6 @@ export const useFetchData = (key) => {
 
     staleTime: 60 * 1000,
   });
-
-  
 
   return {
     data: query.data,

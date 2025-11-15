@@ -35,7 +35,7 @@ const ReusableModal = ({ isOpen, handleClose, children }) => {
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="flex justify-center w-full transform overflow-hidden rounded  p-6 text-left align-middle shadow-xl transition-all text-black">
+            <Dialog.Panel className="flex justify-center w-fit transform overflow-hidden rounded  p-6 text-left align-middle shadow-xl transition-all text-black">
               {children}
             </Dialog.Panel>
           </Transition.Child>

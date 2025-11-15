@@ -1,34 +1,55 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ManagePortfolio from "./ManagePortfolio";
 import ManageSymbol from "./ManageSymbol";
 import ManageStrategy from "./ManageStrategy";
 import ManageJournals from "./ManageJournal";
+import { useSearchParams } from "react-router-dom";
+import ManageEntrySetups from "./MangeEntrySetups";
 
 export default function Manage() {
   const menu = [
     {
       display: "Portfolio",
-      link: "manage/portfolio",
+      link: "portfolio",
       component: <ManagePortfolio />,
     },
     {
       display: "Symbol",
-      link: "manage/symbol",
+      link: "symbol",
       component: <ManageSymbol />,
     },
     {
       display: "Strategy",
-      link: "manage/strategy",
+      link: "strategy",
       component: <ManageStrategy />,
     },
     {
       display: "Journal",
-      link: "manage/journal",
+      link: "journal",
       component: <ManageJournals />,
+    },
+    {
+      display: "Entry Setup",
+      link: "entry_setup",
+      component: <ManageEntrySetups />,
     },
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const [activeParams, setActiveParams] = useSearchParams();
+
+  useEffect(() => {
+    const tab = activeParams.get("tab");
+    if (activeParams) {
+      const getindex = menu.findIndex((val) => val.link === tab);
+
+      if (getindex >= 0) {
+        console.log(getindex);
+
+        setActiveIndex(getindex);
+      }
+    }
+  }, [activeParams]);
 
   return (
     <div className="flex max-h-[90vh] min-h-[80vh] rounded-lg overflow-hidden pt-4">
@@ -42,7 +63,10 @@ export default function Manage() {
                 ? "bg-stone-600 text-white"
                 : "text-gray-300 hover:bg-stone-700"
             }`}
-            onClick={() => setActiveIndex(index)}
+            onClick={() => {
+              setActiveIndex(index);
+              setActiveParams({ tab: item.link });
+            }}
           >
             {item.display}
           </div>
